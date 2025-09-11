@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Site Commercial</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        nav {
+            margin: 20px 0;
+        }
+        nav select {
+            padding: 10px;
+        }
+        .product-container {
+            display: flex;
+            overflow-x: auto; /* Permet le défilement horizontal */
+            padding: 10px;
+        }
+        .product {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-right: 10px; /* Espacement entre les produits */
+            width: 200px;
+            text-align: center;
+        }
+        footer {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>lesfacilitateurs</h1>
+    <nav>
+        <label for="menu">Choisissez une catégorie:</label>
+        <select id="menu" onchange="ouvrirLien(this.value)">
+            <option value="">-- Sélectionnez --</option>
+            <option value="https://www.facebook.com/profile.php?id=61578527953434">administration</option>
+            <option value="https://www.facebook.com/profile.php?id=61579818028906">mode & vetements</option>
+            <option value="https://www.facebook.com/profile.php?id=61579628668796">electromenager</option>
+           <option value="https://www.facebook.com/profile.php?id=61577906790013">btp maconnerie generale</option>
+            <option value="https://www.facebook.com/profile.php?id=61579737781145">livre & pdf </option>
+            <option value="https://www.facebook.com/profile.php?id=61578527953434">community manger</option>
+        </select>
+    </nav>
+</header>
+
+<main>
+    <h2>electromenager</h2>
+    <div class="product-container">
+        <div class="product">
+            <h3>aksynia market</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 1')">
+                <option value="Rouge">assiette</option>
+                <option value="Bleu">marmite chauffante</option>
+                <option value="Vert">tv</option>
+                <option value="Jaune">cuilliere</option>
+                <option value="Rouge">verre</option>
+                <option value="Bleu">sechoire</option>
+                <option value="Vert">couteau</option>
+                <option value="Jaune">micro-onde</option>
+            </select>
+            <button onclick="acheter('Produit 1')">Acheter</button>
+        </div>
+       <div class="product">
+            <h3>e-commerce</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 1')">
+                <option value="Rouge">rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+                <option value="Rouge">rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 1')">Acheter</button>
+        </div>
+        <div class="product">
+            <h3>Produit 2</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 2')">
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+               <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+              
+            </select>
+            <button onclick="acheter('Produit 2')">Acheter</button>
+        </div>
+        <div class="product">
+            <h3>Produit 3</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 3')">
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+               <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 3')">Acheter</button>
+        </div>
+    </div>
+
+    <!-- Deuxième ligne de produits -->
+    <h2> mode & vetements</h2>
+    <div class="product-container">
+        <div class="product">
+            <h3>top deal 237</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 4')">
+                <option value="Rouge">homme</option>
+                <option value="Bleu">femme</option>
+                <option value="Vert">enfant</option>
+                <option value="Jaune">vieillard</option>
+              <option value="Rouge">adolescent</option>
+                <option value="Bleu">bebe</option>
+                <option value="Vert">chaussure</option>
+                <option value="Jaune">calecon,string</option>
+            </select>
+            <button onclick="acheter('Produit 4')">Acheter</button>
+        </div>
+            <div class="product">
+           <h3>Produit 4</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 4')">
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 4')">Acheter</button>
+        </div>
+      <div class="product">
+            <h3>Produit 4</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 4')">
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 4')">Acheter</button>
+        </div>
+        <div class="product">
+            <h3>Produit 5</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 5')">
+                              <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+                           <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 5')">Acheter</button>
+        </div>
+        <div class="product">
+            <h3>Produit 6</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 6')">
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+                  <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 6')">Acheter</button>
+        </div>
+    </div>
+   <h2>service social</h2>
+    <div class="product-container">
+       <div class="product">
+            <h3>Produit 4</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 4')">
+                <option value="Rouge">orphelin</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 4')">Acheter</button>
+        </div>
+        <div class="product">
+            <h3>Produit 4</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 4')">
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+                    <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 4')">Acheter</button>
+        </div>
+        <div class="product">
+            <h3>Produit 5</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 5')">
+                              <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 5')">Acheter</button>
+        </div>
+        <div class="product">
+            <h3>Produit 6</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 6')">
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 6')">Acheter</button>
+        </div>
+    </div>
+   <h2>espace a louer</h2>
+   <div class="product-container">
+        <div class="product">
+            <h3>Produit 4</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 4')">
+                <option value="Rouge">agence de voyage</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 4')">Acheter</button>
+        </div>
+      <div class="product">
+            <h3>Produit 4</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 4')">
+                <option value="Rouge">ets scolaire</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 4')">Acheter</button>
+        </div>
+  <div class="product">
+            <h3>Produit 4</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 4')">
+                <option value="Rouge">à louer</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+               <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 4')">Acheter</button>
+        </div>
+        <div class="product">
+            <h3>Produit 4</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 4')">
+                <option value="Rouge">à louer</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+              <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 4')">Acheter</button>
+        </div>
+     
+        <div class="product">
+            <h3>Produit 5</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 5')">
+                              <option value="Rouge">à louer</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 5')">Acheter</button>
+        </div>
+        <div class="product">
+            <h3>Produit 6</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 6')">
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+               <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 6')">Acheter</button>
+        </div>
+    </div>
+   <h2>espace a louer</h2>
+    <div class="product-container">
+        <div class="product">
+            <h3>Produit 4</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 4')">
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+               <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 4')">Acheter</button>
+        </div>
+      <div class="product">
+            <h3>Produit 4</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 4')">
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+                 <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 4')">Acheter</button>
+        </div>
+      <div class="product">
+            <h3>Produit 4</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 4')">
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+               <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 4')">Acheter</button>
+        </div>
+      
+        <div class="product">
+            <h3>Produit 5</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 5')">
+                              <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+               <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 5')">Acheter</button>
+        </div>
+        <div class="product">
+            <h3>Produit 6</h3>
+            <p>Couleur:</p>
+            <select onchange="changerCouleur(this, 'Produit 6')">
+                <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+               <option value="Rouge">Rouge</option>
+                <option value="Bleu">Bleu</option>
+                <option value="Vert">Vert</option>
+                <option value="Jaune">Jaune</option>
+            </select>
+            <button onclick="acheter('Produit 6')">Acheter</button>
+        </div>
+    </div>
+  
+
+
+
+    <!-- Ajoutez d'autres lignes de produits si nécessaire -->
+    
+</main>
+
+<footer>
+    <p>&copy; 2025 lesfacitateurs groupe Tous droits réservés.</p>
+</footer>
+
+<script>
+    function acheter(produit) {
+        alert("Vous avez choisi d'acheter " + produit + ". Vous allez être redirigé vers le paiement.");
+        window.location.href = "https://www.my-coolpay.com/pay/AxCnwI8R";
+    }
+
+    function changerCouleur(select, produit) {
+        const couleur = select.value;
+        alert("Vous avez choisi la couleur " + couleur + " pour " + produit + ".");
+    }
+
+    function ouvrirLien(lien) {
+        if (lien) {
+            window.location.href = lien; // Ouvre le lien sélectionné
+        }
+    }
+</script>
+
+</body>
+</html>
