@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Programme d'Hinumation</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+body{
+    margin:0;
+    padding:20px;
+    font-family:Arial,sans-serif;
+    background:#e8ecf3;
+}
+
+/* ---- Format A6 ---- */
+.page{
+    width:420px; 
+    min-height:600px;
+    margin:25px auto;
+    background:white;
+    border-radius:12px;
+    padding:15px;
+    position:relative;
+    box-shadow:0 0 12px rgba(0,0,0,0.3);
+    overflow:visible;
+    page-break-after:always;
+}
+
+/* ---- Fond d'écran flou ---- */
+.page img.bg{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    position:absolute;
+    top:0; left:0;
+    z-index:0;
+    filter:blur(2px) brightness(0.8);
+}
+
+/* ---- Tous les textes visibles et lisibles ---- */
+.content{
+    position:relative;
+    z-index:2;
+}
+
+h1,h2{
+    font-weight:bold;
+    color:black;
+    text-shadow:0 0 3px yellow, 0 0 2px yellow;
+}
+
+h1{
+    font-size:22px;
+    text-align:center;
+}
+
+h2{
+    font-size:18px;
+    margin-top:15px;
+}
+
+/* ---- Zones éditables ---- */
+.editable{
+    min-height:40px;
+    padding:8px;
+    background:rgba(255,255,255,0.7);
+    border:2px solid #000;
+    border-radius:8px;
+    margin-bottom:12px;
+    color:black;
+    font-weight:bold;
+    text-shadow:0 0 3px yellow;
+}
+
+/* ---- Profil ---- */
+.profile-photo{
+    width:110px;
+    height:110px;
+    border-radius:50%;
+    border:4px solid yellow;
+    margin:0 auto;
+    overflow:hidden;
+    cursor:pointer;
+    background:#ddd;
+    box-shadow:0 0 10px black;
+}
+
+.profile-photo img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+/* ---- Boutons ---- */
+button{
+    padding:10px 15px;
+    border:none;
+    border-radius:8px;
+    margin:6px 0;
+    font-weight:bold;
+    cursor:pointer;
+    background:#2563eb;
+    color:white;
+}
+
+.add-btn{
+    background:#10b981;
+}
+
+.bg-btn{
+    background:#7c3aed;
+}
+</style>
+</head>
+
+<body>
+
+<!-- -------------------- PAGE 1 : BIOGRAPHIE -------------------- -->
+<div class="page" id="page1">
+    <img class="bg" id="bg1" src="">
+    <div class="content">
+        
+        <div class="profile-photo" id="profile1" onclick="importProfile(this)">
+            Cliquer pour importer
+        </div>
+
+        <h1 id="defuntName" contenteditable="true">Nom du défunt</h1>
+
+        <h2>Biographie</h2>
+        <div class="editable" id="bio" contenteditable="true">Écrire la biographie ici...</div>
+
+        <button class="bg-btn" onclick="importBackground('bg1')">Importer fond d’écran</button>
+    </div>
+</div>
+
+
+<!-- -------------------- PAGE 2 : FAIRE-PART -------------------- -->
+<div class="page" id="page2">
+    <img class="bg" id="bg2" src="">
+    <div class="content">
+
+        <h2>Faire-part</h2>
+        <div class="editable" id="fairepart" contenteditable="true">Écrire le faire-part ici...</div>
+
+        <button class="bg-btn" onclick="importBackground('bg2')">Importer fond d’écran</button>
+    </div>
+</div>
+
+
+<!-- -------------------- PAGE 3 : PROGRAMME -------------------- -->
+<div class="page" id="page3">
+    <img class="bg" id="bg3" src="">
+    <div class="content">
+
+        <h2>Programme</h2>
+        <div class="editable" id="programme" contenteditable="true">Écrire le programme ici...</div>
+
+        <button class="bg-btn" onclick="importBackground('bg3')">Importer fond d’écran</button>
+    </div>
+</div>
+
+
+<!-- -------------------- PAGE 4 : TEMOIGNAGES -------------------- -->
+<div class="page" id="page4">
+    <img class="bg" id="bg4" src="">
+    <div class="content">
+
+        <h2>Témoignages</h2>
+
+        <div id="testimonials"></div>
+
+        <button class="add-btn" onclick="addTestimonial()">Ajouter un témoignage</button>
+        <button class="bg-btn" onclick="importBackground('bg4')">Importer fond d’écran</button>
+    </div>
+</div>
+
+
+<!-- -------------------- PAGE 5 : ITINERAIRE -------------------- -->
+<div class="page" id="page5">
+    <img class="bg" id="bg5" src="">
+    <div class="content">
+
+        <h2>Itinéraire</h2>
+        <div class="editable" id="itinerary" contenteditable="true">Écrire l’itinéraire ici...</div>
+
+        <button class="bg-btn" onclick="importBackground('bg5')">Importer fond d’écran</button>
+    </div>
+</div>
+
+
+<!-- -------------------- BOUTON TELECHARGEMENT -------------------- -->
+<button id="downloadBtn">Télécharger PDF</button>
+
+
+<!-- -------------------- POPUP PAIEMENT -------------------- -->
+<div id="paymentPopup" style="
+display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+background:rgba(0,0,0,0.5);justify-content:center;align-items:center;">
+    <div style="background:white;padding:20px;border-radius:10px;width:300px;text-align:center;">
+        
+        <h3>Paiement HelepMoney</h3>
+        <p>Payer 100 FCFA à :</p>
+        <ul style="text-align:left;">
+            <li>Kono Emini Michel – MoMo : 651475255</li>
+            <li>Kono Emini Michel – OM : 656050097</li>
+        </ul>
+
+        <p>Ou code admin :</p>
+        <input id="adminCode" placeholder="Code admin">
+        
+        <textarea id="transactionMsg" placeholder="Collez le message Momo ici" style="width:100%;height:70px;margin-top:6px;"></textarea>
+
+        <button id="validateBtn">Valider</button>
+        <button onclick="closePopup()">Retour</button>
+
+        <p id="paymentError" style="color:red;font-size:12px;"></p>
+    </div>
+</div>
+
+
+
+<script>
+/* ------------ Import photo profil ------------- */
+function importProfile(el){
+    const input=document.createElement("input");
+    input.type="file"; input.accept="image/*";
+    input.onchange=e=>{
+        const f=e.target.files[0];
+        if(f){
+            const rd=new FileReader();
+            rd.onload=v=>{ el.innerHTML=`<img src="${v.target.result}">`; }
+            rd.readAsDataURL(f);
+        }
+    }
+    input.click();
+}
+
+/* ------------ Import fond écran ------------- */
+function importBackground(id){
+    const input=document.createElement("input");
+    input.type="file"; input.accept="image/*";
+    input.onchange=e=>{
+        const f=e.target.files[0];
+        if(f){
+            const rd=new FileReader();
+            rd.onload=v=>{ document.getElementById(id).src=v.target.result; }
+            rd.readAsDataURL(f);
+        }
+    }
+    input.click();
+}
+
+/* ------------ Ajouter un témoignage ------------- */
+function addTestimonial(){
+    const container=document.getElementById("testimonials");
+
+    const block=document.createElement("div");
+    block.style.marginBottom="15px";
+
+    const profile=document.createElement("div");
+    profile.className="profile-photo";
+    profile.onclick=()=>importProfile(profile);
+
+    const text=document.createElement("div");
+    text.className="editable";
+    text.contentEditable=true;
+    text.innerHTML="Écrire un témoignage ici...";
+
+    block.appendChild(profile);
+    block.appendChild(text);
+
+    container.appendChild(block);
+}
+
+/* ------------ Paiement ------------- */
+const popup=document.getElementById("paymentPopup");
+document.getElementById("downloadBtn").onclick=()=>popup.style.display="flex";
+
+function closePopup(){
+    popup.style.display="none";
+    document.getElementById("paymentError").textContent="";
+}
+
+/* ------------ Validation paiement ------------- */
+let usedIds=[];
+
+document.getElementById("validateBtn").onclick=()=>{
+
+    const code=document.getElementById("adminCode").value.trim();
+    const msg=document.getElementById("transactionMsg").value.trim();
+    const error=document.getElementById("paymentError");
+
+    error.textContent="";
+
+    const ADMIN="233233";
+    const users=[
+        {name:"Kono Emini Michel", momo:"651475255"},
+        {name:"Kono Emini Michel", momo:"656050097"}
+    ];
+
+    if(code===ADMIN){
+        closePopup();
+        downloadPDF();
+        return;
+    }
+
+    const regex=/à\s(.+)\s\((\d+)\)\sId:(\d+)\sle\s([\d-]+\s[\d:]+)/i;
+    const m=msg.match(regex);
+
+    if(!m){ error.textContent="Message Momo invalide."; return; }
+
+    const [_, name, momo, id, dateStr]=m;
+    const txnTime=new Date(dateStr);
+    const now=new Date();
+    const limit=new Date(now.getTime()-10*60000);
+
+    if(txnTime<limit){ error.textContent="Transaction trop ancienne."; return; }
+    if(usedIds.includes(id)){ error.textContent="ID déjà utilisé."; return; }
+
+    const ok=users.find(u=>u.name===name && u.momo===momo);
+    if(!ok){ error.textContent="Nom/Numéro incorrect."; return; }
+
+    usedIds.push(id);
+    closePopup();
+    downloadPDF();
+}
+
+/* ------------ Télécharger PDF ------------- */
+function downloadPDF() {
+    // Création d’un conteneur temporaire qui contient TOUTES les pages
+    const container = document.createElement("div");
+    container.style.width = "420px"; 
+    container.style.padding = "0";
+    container.style.margin = "0";
+    
+    document.querySelectorAll(".page").forEach(page => {
+        const clone = page.cloneNode(true);
+        clone.style.pageBreakAfter = "always";
+        container.appendChild(clone);
+    });
+
+    document.body.appendChild(container);
+
+    const opt = {
+        margin: 0,
+        filename: "ProgrammeHinumation.pdf",
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "pt", format: "a6", orientation: "portrait" }
+    };
+
+    html2pdf()
+        .set(opt)
+        .from(container)
+        .save()
+        .then(() => container.remove()); // nettoyage
+}
+</script>
+
+</body>
+</html>
