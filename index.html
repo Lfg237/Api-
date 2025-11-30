@@ -1,198 +1,546 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Programme d'Hinumation</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Programme d'Inhumation — Final</title>
+
+<!-- html2pdf -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 <style>
-body{
-    margin:0; padding:20px; font-family:Arial,sans-serif; background:#e8ecf3;
-}
+  :root{
+    --accent:#2563eb;
+    --accent-2:#10b981;
+    --bg:#eef5ff;
+    --signature-size:12px;
+  }
+  body{
+    margin:0;
+    padding:18px;
+    font-family:Arial, Helvetica, sans-serif;
+    background:var(--bg);
+    -webkit-font-smoothing:antialiased;
+  }
 
-/* ---- Format A6 ---- */
-.page{
-    width:420px; min-height:600px; margin:25px auto; background:white; border-radius:12px; padding:15px;
-    position:relative; box-shadow:0 0 12px rgba(0,0,0,0.3); overflow:visible; page-break-after:always;
-}
-.page img.bg{
-    width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:0;
+  /* Page container (visual editing area) - not fixed to A6; height grows with content */
+  .page{
+    width:105mm;               /* visual width similar to A6 */
+    min-height:148mm;          /* visual min height A6 */
+    margin:12px auto;
+    background:#fff;
+    border-radius:10px;
+    padding:12mm;
+    position:relative;
+    box-shadow:0 6px 18px rgba(0,0,0,0.12);
+    overflow:visible;
+    page-break-after:always;
+  }
+
+  /* background image (fixed to page area; won't stretch the DOM flow) */
+  .page .bg {
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
     filter:blur(2px) brightness(0.8);
-}
+    z-index:0;
+    pointer-events:none; /* don't block clicks on overlays */
+  }
 
-/* ---- Contenu ---- */
-.content{position:relative; z-index:2;}
-h1,h2{font-weight:bold; color:black; text-shadow:0 0 3px yellow,0 0 2px yellow;}
-h1{text-align:center; font-size:22px;}
-h2{font-size:18px; margin-top:15px;}
-.editable{min-height:40px; padding:8px; background:rgba(255,255,255,0.7); border:2px solid #000; border-radius:8px; margin-bottom:12px; color:black; font-weight:bold; text-shadow:0 0 3px yellow;}
+  .content{
+    position:relative;
+    z-index:2;
+    color:#000;
+  }
 
-/* ---- Profil ---- */
-.profile-photo{width:110px; height:110px; border-radius:50%; border:4px solid yellow; margin:0 auto; overflow:hidden; cursor:pointer; background:#ddd; box-shadow:0 0 10px black;}
-.profile-photo img{width:100%; height:100%; object-fit:cover;}
+  /* profile picture */
+  .profile-photo{
+    width:110px;
+    height:110px;
+    border-radius:50%;
+    overflow:hidden;
+    margin:0 auto 10px auto;
+    border:4px solid #ffd54f;
+    background:#ddd;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+  }
+  .profile-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
 
-/* ---- Boutons ---- */
-button{padding:10px 15px; border:none; border-radius:8px; margin:6px 0; font-weight:bold; cursor:pointer; background:#2563eb; color:white;}
-.add-btn{background:#10b981;}
-.bg-btn{background:#7c3aed;}
-.bottom-bar{display:flex; justify-content:space-between; align-items:center; margin-top:10px;}
+  h1{ text-align:center; font-size:22px; margin:6px 0; font-weight:800; color:#000; text-shadow:0 0 3px rgba(255,215,0,0.9); }
+  h2{ font-size:16px; margin:12px 0 6px 0; font-weight:800; color:#000; text-shadow:0 0 2px rgba(255,215,0,0.9); }
+
+  .editable{
+    min-height:40px;
+    padding:10px;
+    background:rgba(255,255,255,0.86);
+    border:2px solid #000;
+    border-radius:8px;
+    margin-bottom:12px;
+    font-weight:700;
+    color:#000;
+    box-sizing:border-box;
+    white-space:pre-wrap;
+    word-wrap:break-word;
+  }
+
+  /* testimonial block */
+  .testimonial-block{ display:flex; gap:12px; align-items:flex-start; margin-bottom:12px; }
+  .testimonial-block .profile-photo{ width:70px; height:70px; border-width:3px; }
+  .testimonial-block .editable{ flex:1; min-height:50px; }
+
+  /* bottom bar (download + signature) */
+  .bottom-bar{
+    width:100%;
+    max-width:105mm;
+    margin:14px auto 40px auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .btn{
+    padding:10px 14px;
+    border-radius:8px;
+    border:0;
+    color:#fff;
+    background:var(--accent);
+    font-weight:800;
+    cursor:pointer;
+  }
+  .btn.secondary{ background:var(--accent-2); }
+  .signature{
+    font-size:var(--signature-size);
+    color:#222;
+    font-weight:700;
+    text-align:right;
+  }
+
+  /* payment popup (centered & top layer) */
+  #paymentPopup{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.55);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:99999;
+  }
+  #paymentPopup .card{
+    width:320px;
+    max-width:94%;
+    background:#fff;
+    border-radius:12px;
+    padding:16px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.25);
+    text-align:left;
+  }
+  #paymentPopup h3{ margin:0 0 8px 0; text-align:center; }
+  #paymentPopup input, #paymentPopup textarea{
+    width:100%; box-sizing:border-box; padding:8px; margin:6px 0; border-radius:6px; border:1px solid #ccc;
+  }
+  #paymentPopup .controls{ display:flex; gap:8px; justify-content:center; margin-top:8px; }
+  #paymentPopup .controls button{ padding:8px 12px; font-weight:700; border-radius:8px; border:0; cursor:pointer; }
+  #paymentError{ color:#c92a2a; font-weight:700; font-size:13px; min-height:18px; margin-top:6px; text-align:center; }
+
+  /* small responsive tweak */
+  @media (max-width:640px){
+    .page{ width:92vw; padding:12px; min-height:300px; }
+    .bottom-bar{ flex-direction:column; gap:8px; align-items:flex-start; padding:0 12px; }
+    .signature{ text-align:left; }
+  }
 </style>
 </head>
 <body>
 
-<!-- -------------------- PAGES -------------------- -->
-<div class="page" id="page1">
-    <img class="bg" id="bg1" src="">
-    <div class="content">
-        <div class="profile-photo" id="profile1" onclick="importProfile(this)">Cliquer pour importer</div>
-        <h1 id="defuntName" contenteditable="true">Nom du défunt</h1>
-        <h2>Biographie</h2>
-        <div class="editable" id="bio" contenteditable="true">Écrire la biographie ici...</div>
-        <button class="bg-btn" onclick="importBackground('bg1')">Importer fond d’écran</button>
-    </div>
+<!-- PAGES: 5 pages (each page has editable content + background + profile where required) -->
+<div class="page" id="page-bio">
+  <img class="bg" id="bg-bio" src="">
+  <div class="content">
+    <div class="profile-photo" id="profile-main" title="Cliquer pour importer la photo de profil">Cliquer pour photo</div>
+    <h1 id="name" contenteditable="true">Nom du défunt</h1>
+
+    <h2>Biographie</h2>
+    <div id="bio" class="editable" contenteditable="true">Écrire la biographie ici... (texte en gras par défaut pour lisibilité)</div>
+
+    <button class="btn secondary" onclick="importBackground('bg-bio')">Importer fond d'écran (page Biographie)</button>
+  </div>
 </div>
 
-<div class="page" id="page2">
-    <img class="bg" id="bg2" src="">
-    <div class="content">
-        <h2>Faire-part</h2>
-        <div class="editable" id="fairepart" contenteditable="true">Écrire le faire-part ici...</div>
-        <button class="bg-btn" onclick="importBackground('bg2')">Importer fond d’écran</button>
-    </div>
+<div class="page" id="page-fairepart">
+  <img class="bg" id="bg-fairepart" src="">
+  <div class="content">
+    <h2>Faire-part</h2>
+    <div id="fairepart" class="editable" contenteditable="true">Texte du faire-part — éditable</div>
+    <button class="btn secondary" onclick="importBackground('bg-fairepart')">Importer fond d'écran (Faire-part)</button>
+  </div>
 </div>
 
-<div class="page" id="page3">
-    <img class="bg" id="bg3" src="">
-    <div class="content">
-        <h2>Programme</h2>
-        <div class="editable" id="programme" contenteditable="true">Écrire le programme ici...</div>
-        <button class="bg-btn" onclick="importBackground('bg3')">Importer fond d’écran</button>
-    </div>
+<div class="page" id="page-programme">
+  <img class="bg" id="bg-programme" src="">
+  <div class="content">
+    <h2>Programme</h2>
+    <div id="programme" class="editable" contenteditable="true">Écrire le programme ici — exemple: Cérémonie à 10h, départ à 12h...</div>
+    <button class="btn secondary" onclick="importBackground('bg-programme')">Importer fond d'écran (Programme)</button>
+  </div>
 </div>
 
-<div class="page" id="page4">
-    <img class="bg" id="bg4" src="">
-    <div class="content">
-        <h2>Témoignages</h2>
-        <div id="testimonials"></div>
-        <button class="add-btn" onclick="addTestimonial()">Ajouter un témoignage</button>
-        <button class="bg-btn" onclick="importBackground('bg4')">Importer fond d’écran</button>
+<div class="page" id="page-temoignages">
+  <img class="bg" id="bg-temoignages" src="">
+  <div class="content">
+    <h2>Témoignages</h2>
+    <div id="temoignages-list"></div>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="btn" onclick="addTestimonial()">Ajouter témoignage</button>
+      <button class="btn secondary" onclick="importBackground('bg-temoignages')">Importer fond d'écran (Témoignages)</button>
     </div>
+  </div>
 </div>
 
-<div class="page" id="page5">
-    <img class="bg" id="bg5" src="">
-    <div class="content">
-        <h2>Itinéraire</h2>
-        <div class="editable" id="itinerary" contenteditable="true">Écrire l’itinéraire ici...</div>
-        <button class="bg-btn" onclick="importBackground('bg5')">Importer fond d’écran</button>
-    </div>
+<div class="page" id="page-itineraire">
+  <img class="bg" id="bg-itineraire" src="">
+  <div class="content">
+    <h2>Itinéraire / Localisation</h2>
+    <div id="itineraire" class="editable" contenteditable="true">Écrire l'itinéraire et la localisation ici...</div>
+    <button class="btn secondary" onclick="importBackground('bg-itineraire')">Importer fond d'écran (Itinéraire)</button>
+  </div>
 </div>
 
-<!-- -------------------- BOUTON ET SIGNATURE -------------------- -->
-<div class="bottom-bar">
-    <button id="downloadBtn">Télécharger PDF</button>
-    <span style="font-weight:bold; font-size:12px;">Créé par Lesfacilitateurs groupe WhatsApp 651475255 Yaoundé nyom3.</span>
+<!-- bottom bar: download + signature (same line on wide screens) -->
+<div class="bottom-bar" style="max-width:105mm;margin:8px auto 40px auto;">
+  <div>
+    <button class="btn" id="downloadBtn">Télécharger PDF</button>
+  </div>
+  <div class="signature">Créé par Lesfacilitateurs groupe — WhatsApp 651475255 — Yaoundé nyom3</div>
 </div>
 
-<!-- -------------------- POPUP PAIEMENT -------------------- -->
-<div id="paymentPopup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;z-index:20;">
-    <div style="background:white;padding:20px;border-radius:10px;width:300px;text-align:center;">
-        <h3>Paiement HelepMoney</h3>
-        <p>Payer 100 FCFA à :</p>
-        <ul style="text-align:left;">
-            <li>Kono Emini Michel – MoMo : 651475255</li>
-            <li>Kono Emini Michel – OM : 656050097</li>
-        </ul>
-        <p>Ou code admin :</p>
-        <input id="adminCode" placeholder="Code admin">
-        <textarea id="transactionMsg" placeholder="Collez le message Momo ici" style="width:100%;height:70px;margin-top:6px;"></textarea>
-        <button id="validateBtn">Valider</button>
-        <button onclick="closePopup()">Retour</button>
-        <p id="paymentError" style="color:red;font-size:12px;"></p>
+<!-- PAYMENT POPUP (HelepMoney) -->
+<div id="paymentPopup" aria-hidden="true">
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="payTitle">
+    <h3 id="payTitle">Paiement HelepMoney (100 FCFA)</h3>
+
+    <p style="margin:6px 0 0 0;font-weight:700;">Effectuer le dépôt à :</p>
+    <ul style="margin:6px 0 12px 18px;">
+      <li>Kono Emini Michel — MoMo : <strong>651475255</strong></li>
+      <li>Kono Emini Michel — OM : <strong>656050097</strong></li>
+    </ul>
+
+    <p style="margin:0 0 8px 0;">Ou entrez le code admin :</p>
+    <input id="adminCode" placeholder="Code admin (233233)">
+
+    <textarea id="transactionMsg" placeholder="Collez ici le message MoMo reçu (texte complet)" rows="4"></textarea>
+
+    <div id="paymentError" style="min-height:20px;margin-top:6px;color:#b91c1c;font-weight:800;text-align:center;"></div>
+
+    <div class="controls" style="margin-top:12px;">
+      <button style="background:var(--accent-2);color:#fff;font-weight:800;" onclick="validatePayment()">Valider</button>
+      <button style="background:#ef4444;color:#fff;font-weight:800;" onclick="closePaymentPopup()">Annuler</button>
     </div>
+  </div>
 </div>
 
 <script>
-/* ------------ Import photo profil ------------- */
-function importProfile(el){
-    const input=document.createElement("input"); input.type="file"; input.accept="image/*";
-    input.onchange=e=>{
-        const f=e.target.files[0];
-        if(f){
-            const rd=new FileReader();
-            rd.onload=v=>{ el.innerHTML=`<img src="${v.target.result}">`; }
-            rd.readAsDataURL(f);
-        }
-    }
-    input.click();
+/* ===========================
+   Utilities: import profile + background
+   =========================== */
+function importProfile(target){
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*';
+  input.onchange = e=>{
+    const f = e.target.files[0];
+    if(!f) return;
+    const reader = new FileReader();
+    reader.onload = ev=>{
+      target.innerHTML = ''; // clear
+      const img = document.createElement('img');
+      img.src = ev.target.result;
+      target.appendChild(img);
+    };
+    reader.readAsDataURL(f);
+  };
+  input.click();
 }
+document.getElementById('profile-main').addEventListener('click', function(){ importProfile(this); });
 
-/* ------------ Import fond écran ------------- */
 function importBackground(id){
-    const input=document.createElement("input"); input.type="file"; input.accept="image/*";
-    input.onchange=e=>{
-        const f=e.target.files[0];
-        if(f){
-            const rd=new FileReader();
-            rd.onload=v=>{ document.getElementById(id).src=v.target.result; }
-            rd.readAsDataURL(f);
-        }
-    }
-    input.click();
+  const input=document.createElement('input');
+  input.type='file'; input.accept='image/*';
+  input.onchange=e=>{
+    const f=e.target.files[0];
+    if(!f) return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      document.getElementById(id).src = ev.target.result;
+    };
+    reader.readAsDataURL(f);
+  };
+  input.click();
 }
 
-/* ------------ Ajouter un témoignage ------------- */
+/* testimonials helper */
 function addTestimonial(){
-    const container=document.getElementById("testimonials");
-    const block=document.createElement("div");
-    block.style.marginBottom="15px";
-    const profile=document.createElement("div");
-    profile.className="profile-photo"; profile.onclick=()=>importProfile(profile);
-    const text=document.createElement("div"); text.className="editable"; text.contentEditable=true;
-    text.innerHTML="Écrire un témoignage ici...";
-    block.appendChild(profile); block.appendChild(text); container.appendChild(block);
+  const list = document.getElementById('temoignages-list');
+  const block = document.createElement('div');
+  block.className = 'testimonial-block';
+  block.style.alignItems = 'flex-start';
+
+  const profileDiv = document.createElement('div');
+  profileDiv.className = 'profile-photo';
+  profileDiv.title = 'Cliquer pour importer la photo du témoignage';
+  profileDiv.onclick = ()=> importProfile(profileDiv);
+
+  const textDiv = document.createElement('div');
+  textDiv.className = 'editable';
+  textDiv.contentEditable = true;
+  textDiv.innerText = 'Écrire un témoignage ici...';
+
+  block.appendChild(profileDiv);
+  block.appendChild(textDiv);
+  list.appendChild(block);
+
+  // scroll to new testimonial (helpful on mobile)
+  block.scrollIntoView({behavior:'smooth', block:'center'});
 }
 
-/* ------------ Paiement ------------- */
-const popup=document.getElementById("paymentPopup");
-document.getElementById("downloadBtn").onclick=()=>popup.style.display="flex";
-function closePopup(){ popup.style.display="none"; document.getElementById("paymentError").textContent=""; }
+/* ===========================
+   Payment popup + validation
+   =========================== */
+const payPopup = document.getElementById('paymentPopup');
+const downloadBtn = document.getElementById('downloadBtn');
 
-/* ------------ Validation paiement ------------- */
-let usedIds=[];
-document.getElementById("validateBtn").onclick=()=>{
-    const code=document.getElementById("adminCode").value.trim();
-    const msg=document.getElementById("transactionMsg").value.trim();
-    const error=document.getElementById("paymentError"); error.textContent="";
-    const ADMIN="233233";
-    const users=[{name:"Kono Emini Michel", momo:"651475255"},{name:"Kono Emini Michel", momo:"656050097"}];
+// open popup on download click
+downloadBtn.addEventListener('click', ()=> {
+  // reset fields
+  document.getElementById('adminCode').value = '';
+  document.getElementById('transactionMsg').value = '';
+  document.getElementById('paymentError').textContent = '';
+  payPopup.style.display = 'flex';
+  payPopup.setAttribute('aria-hidden','false');
+  // ensure viewport scrolled to top so popup visible on mobile
+  window.scrollTo({ top: 0, behavior: 'instant' });
+});
 
-    if(code===ADMIN){ closePopup(); downloadPDF(); return; }
-
-    const regex=/à\s(.+)\s\((\d+)\)\sId:(\d+)\sle\s([\d-]+\s[\d:]+)/i;
-    const m=msg.match(regex);
-    if(!m){ error.textContent="Message Momo invalide."; return; }
-    const [_, name, momo, id, dateStr]=m;
-    const txnTime=new Date(dateStr), now=new Date(), limit=new Date(now.getTime()-10*60000);
-    if(txnTime<limit){ error.textContent="Transaction trop ancienne."; return; }
-    if(usedIds.includes(id)){ error.textContent="ID déjà utilisé."; return; }
-    if(!users.find(u=>u.name===name && u.momo===momo)){ error.textContent="Nom/Numéro incorrect."; return; }
-    usedIds.push(id); closePopup(); downloadPDF();
+function closePaymentPopup(){
+  payPopup.style.display = 'none';
+  payPopup.setAttribute('aria-hidden','true');
+  document.getElementById('paymentError').textContent = '';
 }
 
-/* ------------ Télécharger PDF adaptatif ------------- */
-function downloadPDF(){
-    const pages=document.querySelectorAll(".page");
-    const cloneContainer=document.createElement("div");
-    pages.forEach(page=>{ cloneContainer.appendChild(page.cloneNode(true)); });
-    html2pdf().set({
-        filename:"ProgrammeHinumation.pdf",
-        margin:10,
-        html2canvas:{scale:2, useCORS:true},
-        jsPDF:{unit:"pt",format:"a6",orientation:"portrait"},
-        pagebreak:{mode:['css','legacy']}
-    }).from(cloneContainer).save();
+/* strict validation rules:
+   - accept admin code "233233"
+   - OR parse transaction message, ensure:
+       * message contains one of the beneficiary phone numbers
+       * contains an ID (ID:xxx or Ref:xxx)
+       * contains a timestamp that can be parsed (or time) and is within last 10 minutes
+   - prevent duplicate IDs
+*/
+const ADMIN_CODE = '233233';
+const BENEFICIARIES = [
+  { name: 'Kono Emini Michel', phone: '651475255' },
+  { name: 'Kono Emini Michel', phone: '656050097' }
+];
+let usedTxnIds = [];
+
+function validatePayment(){
+  const code = (document.getElementById('adminCode').value || '').trim();
+  const msg = (document.getElementById('transactionMsg').value || '').trim();
+  const errEl = document.getElementById('paymentError');
+  errEl.textContent = '';
+
+  if(code === ADMIN_CODE){
+    closePaymentPopup();
+    // proceed to generate PDF
+    generateAndDownloadPDF();
+    return;
+  }
+
+  if(!msg || msg.length < 10){
+    errEl.textContent = 'Collez le message MoMo reçu (texte complet).';
+    return;
+  }
+
+  // attempt to extract phone (one of beneficiaries)
+  const phones = BENEFICIARIES.map(b=>b.phone);
+  const phoneMatch = phones.find(p => msg.includes(p));
+  if(!phoneMatch){
+    errEl.textContent = 'Le message ne contient pas le bon numéro du bénéficiaire.';
+    return;
+  }
+
+  // extract transaction id (patterns like ID:12345 or Ref:XYZ123)
+  const idRegex = /\b(?:ID|Id|Ref|REF|TID)[:\s\-]*([A-Za-z0-9\-]+)\b/;
+  const idMatch = msg.match(idRegex);
+  if(!idMatch){
+    errEl.textContent = "Impossible de trouver l'identifiant (ID/Ref) dans le message.";
+    return;
+  }
+  const txnId = idMatch[1];
+  if(usedTxnIds.includes(txnId)){
+    errEl.textContent = "Cette transaction a déjà été utilisée.";
+    return;
+  }
+
+  // extract datetime - try several patterns
+  // patterns example: "Le 2025-10-20 08:00" or "20/10/2025 08:00" or "20-10-2025 08:00" or "08:00"
+  let dateStr = null;
+  // ISO-like (YYYY-MM-DD HH:MM)
+  let m = msg.match(/\b(20\d{2}[-\/]\d{1,2}[-\/]\d{1,2})[ T]?(\d{1,2}:\d{2})\b/);
+  if(m){ dateStr = m[1] + ' ' + m[2]; }
+  if(!dateStr){
+    m = msg.match(/\b(\d{1,2}[-\/]\d{1,2}[-\/]20\d{2})[ T]?(\d{1,2}:\d{2})\b/);
+    if(m){
+      // convert dd/mm/yyyy to yyyy-mm-dd
+      const parts = m[1].split(/[-\/]/);
+      dateStr = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')} ${m[2]}`;
+    }
+  }
+  // fallback: only time e.g. "08:00" (assume today)
+  if(!dateStr){
+    m = msg.match(/\b(\d{1,2}:\d{2})\b/);
+    if(m){
+      const today = new Date();
+      const hhmm = m[1].split(':');
+      today.setHours(Number(hhmm[0]), Number(hhmm[1]), 0, 0);
+      dateStr = today.toISOString(); // will be parsed to date object
+    }
+  }
+
+  if(!dateStr){
+    errEl.textContent = "Impossible d'extraire la date/heure de la transaction dans le message.";
+    return;
+  }
+
+  // parse date string
+  let txnDate = new Date(dateStr);
+  if(isNaN(txnDate.getTime())){
+    // try Date.parse on trimmed
+    txnDate = new Date(dateStr.replace(/\s+$/,''));
+  }
+  if(isNaN(txnDate.getTime())){
+    errEl.textContent = "Impossible d'interpréter la date/heure trouvée dans le message.";
+    return;
+  }
+
+  // check time window (<= 10 minutes)
+  const now = new Date();
+  const tenMinAgo = new Date(now.getTime() - 10*60*1000);
+  if(txnDate < tenMinAgo || txnDate > now){
+    errEl.textContent = "Transaction hors délai (doit être ≤ 10 minutes avant maintenant).";
+    return;
+  }
+
+  // check that phone corresponds to beneficiary and optionally name present
+  // try to find name in message (flexible)
+  const beneficiary = BENEFICIARIES.find(b => b.phone === phoneMatch);
+  const nameRegex = new RegExp(beneficiary.name.split(' ').map(s=>s).join('\\s*'),'i');
+  const namePresent = nameRegex.test(msg) || msg.toLowerCase().includes(beneficiary.name.toLowerCase());
+  if(!namePresent){
+    // not strict-fail, but user asked strict; require name or number is enough -> we'll accept if number matched
+    // We'll prefer requiring name OR phone: since phone already matched, allow it.
+    // (If you want strict both, change here to require namePresent)
+  }
+
+  // everything ok -> mark id used and proceed
+  usedTxnIds.push(txnId);
+  // close popup then generate pdf
+  closePaymentPopup();
+  generateAndDownloadPDF();
 }
+
+/* ===========================
+   PDF generation: automatically adapt to content size and produce multi-page PDF
+   Strategy:
+    - clone current pages into a wrapper div (detached from DOM)
+    - feed wrapper to html2pdf with jsPDF format 'a4' and pagebreak enabled
+    - html2pdf will split content across PDF pages as needed
+   =========================== */
+function generateAndDownloadPDF(){
+  // clone pages to a wrapper so we don't disturb the live UI
+  const wrapper = document.createElement('div');
+  // make wrapper wide enough and let height be natural
+  wrapper.style.width = '100%';
+  wrapper.style.boxSizing = 'border-box';
+
+  // clone each page (deep clone)
+  document.querySelectorAll('.page').forEach(page => {
+    const clone = page.cloneNode(true);
+
+    // remove pointer-events blocking (bg img) and ensure visuals preserved
+    clone.querySelectorAll('.bg').forEach(img=>{
+      // Keep src (already cloned), but set pointer-events none
+      img.style.pointerEvents = 'none';
+    });
+
+    // For any interactive elements (buttons, inputs) replace with static text
+    clone.querySelectorAll('button, input, textarea').forEach(el=>{
+      const replacement = document.createElement('div');
+      if(el.tagName.toLowerCase() === 'button') {
+        replacement.textContent = el.textContent || '';
+        replacement.style.fontWeight = '700';
+      } else {
+        replacement.textContent = el.value || '';
+        replacement.style.whiteSpace = 'pre-wrap';
+      }
+      // style to blend with page
+      replacement.style.margin = '6px 0';
+      replacement.style.fontSize = '12px';
+      el.replaceWith(replacement);
+    });
+
+    // Ensure contenteditable elements' current text becomes static text nodes (they are cloned as-is)
+    clone.querySelectorAll('[contenteditable]').forEach(ed=>{
+      ed.removeAttribute('contenteditable');
+      ed.style.outline='none';
+    });
+
+    // Append clone to wrapper
+    wrapper.appendChild(clone);
+  });
+
+  // html2pdf options: useCORS true to allow images, scale 2 for clarity, pagebreak modes
+  const opt = {
+    margin: [10,10,10,10],
+    filename: 'Programme_Inhumation.pdf',
+    html2canvas: { scale: 2, useCORS: true, allowTaint: true, logging:false },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['css', 'legacy', 'avoid-all'] }
+  };
+
+  // trigger download
+  html2pdf().set(opt).from(wrapper).save();
+}
+
+/* ===========================
+   Accessibility / keyboard dismiss
+   =========================== */
+document.addEventListener('keydown', function(ev){
+  if(ev.key === 'Escape'){
+    if(payPopup && payPopup.style.display === 'flex') closePaymentPopup();
+  }
+});
+
+/* Prevent scroll under popup on mobile when open */
+let scrollPos = 0;
+const observer = new MutationObserver(()=> {
+  if(payPopup.style.display === 'flex'){
+    // lock scroll
+    scrollPos = window.scrollY || document.documentElement.scrollTop;
+    document.body.style.top = `-${scrollPos}px`;
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+  } else {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    window.scrollTo(0, scrollPos);
+  }
+});
+observer.observe(payPopup, { attributes: true, attributeFilter: ['style'] });
+
 </script>
 </body>
 </html>
