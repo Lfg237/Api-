@@ -3,24 +3,21 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Programme d'Inhumation — Pro</title>
+<title>Programme d'Inhumation — Pro FIX</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-:root{
-  --accent:#2563eb;
-  --accent2:#10b981;
-}
-
 body{
   margin:0;
   font-family:Arial;
-  background:linear-gradient(120deg,#0f172a,#1e293b);
+  background:#0f172a;
   color:#fff;
 }
 
-/* PAGES */
+/* PAGE */
 .page{
   width:105mm;
   min-height:148mm;
@@ -29,23 +26,35 @@ body{
   color:#000;
   padding:12mm;
   border-radius:12px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.3);
-  page-break-inside:avoid;
   position:relative;
+  overflow:hidden;
+  box-shadow:0 10px 25px rgba(0,0,0,0.3);
 }
 
+/* BACKGROUND */
 .bg{
   position:absolute;
   inset:0;
   width:100%;
   height:100%;
   object-fit:cover;
-  opacity:.25;
+  opacity:0.25;
+  z-index:0;
 }
 
-.content{
-  position:relative;
-  z-index:2;
+/* CONTENT */
+.content{position:relative;z-index:2}
+
+h1{font-size:22px;text-align:center;font-weight:900}
+h2{margin-top:10px}
+
+/* EDIT */
+.editable{
+  border:2px solid #000;
+  padding:10px;
+  border-radius:8px;
+  font-weight:bold;
+  background:#fff;
 }
 
 /* PHOTO */
@@ -54,60 +63,50 @@ body{
   height:110px;
   border-radius:50%;
   overflow:hidden;
-  margin:auto;
   border:4px solid gold;
+  margin:auto;
   cursor:pointer;
   background:#ddd;
-  display:flex;
-  align-items:center;
-  justify-content:center;
 }
 
-/* TEXT */
-h1{
-  text-align:center;
-  font-size:22px;
-  font-weight:900;
-}
-
-h2{
-  margin-top:12px;
-}
-
-.editable{
-  border:2px solid #000;
-  padding:10px;
-  border-radius:8px;
-  margin-bottom:10px;
-  font-weight:bold;
-  background:#fff;
-}
-
-/* BUTTONS */
+/* BUTTON */
 .btn{
   padding:10px;
   border:0;
   border-radius:8px;
   font-weight:bold;
   cursor:pointer;
-  margin:5px 0;
 }
+.primary{background:#2563eb;color:#fff}
+.secondary{background:#10b981;color:#fff}
 
-.primary{background:var(--accent);color:#fff;}
-.secondary{background:var(--accent2);color:#fff;}
-
-.bottom{
-  max-width:105mm;
-  margin:auto;
+/* TEMOINS */
+.temoin{
   display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:10px;
+  gap:10px;
+  margin-bottom:10px;
+}
+.temoin .photo{
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  border:2px solid #ccc;
+  cursor:pointer;
+  background:#eee;
+}
+.temoin .text{
+  flex:1;
+  border:2px solid #000;
+  padding:8px;
+  border-radius:8px;
+  font-weight:bold;
 }
 
-.signature{
+/* FOOT */
+.footer{
+  text-align:center;
   font-size:11px;
-  color:#ccc;
+  margin-top:10px;
 }
 </style>
 </head>
@@ -119,14 +118,12 @@ h2{
 <img class="bg" id="bg1">
 <div class="content">
 
-<div class="profile-photo" onclick="importImg(this)">Photo</div>
+<div class="profile-photo" onclick="importImg(this)"></div>
 
 <h1 contenteditable="true">Nom du défunt</h1>
 
 <h2>Biographie</h2>
-<div class="editable" contenteditable="true">
-Écrire une biographie complète ici...
-</div>
+<div class="editable" contenteditable="true">Texte biographie...</div>
 
 <button class="btn secondary" onclick="bgUpload('bg1')">Fond</button>
 
@@ -138,10 +135,8 @@ h2{
 <img class="bg" id="bg2">
 <div class="content">
 
-<h2>Faire-part</h2>
-<div class="editable" contenteditable="true">
-Texte du faire-part...
-</div>
+<h2>Programme</h2>
+<div class="editable" contenteditable="true">Programme...</div>
 
 <button class="btn secondary" onclick="bgUpload('bg2')">Fond</button>
 
@@ -153,12 +148,10 @@ Texte du faire-part...
 <img class="bg" id="bg3">
 <div class="content">
 
-<h2>Programme</h2>
-<div class="editable" contenteditable="true">
-Programme complet...
-</div>
+<h2>Témoignages</h2>
+<div id="temoins"></div>
 
-<button class="btn secondary" onclick="bgUpload('bg3')">Fond</button>
+<button class="btn primary" onclick="addTemoin()">Ajouter témoignage</button>
 
 </div>
 </div>
@@ -168,187 +161,142 @@ Programme complet...
 <img class="bg" id="bg4">
 <div class="content">
 
-<h2>Témoignages</h2>
-<div id="temoins"></div>
+<h2>Itinéraire</h2>
+<div class="editable" contenteditable="true">Localisation...</div>
 
-<button class="btn primary" onclick="addTemoin()">+ Témoignage</button>
 <button class="btn secondary" onclick="bgUpload('bg4')">Fond</button>
 
 </div>
 </div>
 
-<!-- PAGE 5 -->
-<div class="page">
-<img class="bg" id="bg5">
-<div class="content">
-
-<h2>Itinéraire</h2>
-<div class="editable" contenteditable="true">
-Localisation...
-</div>
-
-<button class="btn secondary" onclick="bgUpload('bg5')">Fond</button>
-
-</div>
-</div>
-
 <!-- DOWNLOAD -->
-<div class="bottom">
-<button class="btn primary" id="download">Télécharger PDF</button>
-<div class="signature">Lesfacilitateurs Groupe • WhatsApp 651475255</div>
+<div style="text-align:center;margin:20px;">
+<button class="btn primary" onclick="downloadPDF()">Télécharger PDF</button>
+</div>
+
+<div class="footer">
+Créé par ETS Lesfacilitateurs Groupe • WhatsApp +237651475255
 </div>
 
 <script>
-	const CODE = "233233";
 
-document.getElementById("download").onclick = async ()=>{
+const CODE = "233233";
 
-  let c = prompt("Entrez le code :");
+/* IMAGE PROFILE */
+function importImg(el){
+  const input=document.createElement("input");
+  input.type="file";
+  input.accept="image/*";
+
+  input.onchange=e=>{
+    const file=e.target.files[0];
+    const reader=new FileReader();
+
+    reader.onload=ev=>{
+      el.innerHTML="";
+      const img=document.createElement("img");
+      img.src=ev.target.result;
+      img.style.width="100%";
+      img.style.height="100%";
+      img.style.objectFit="cover";
+      el.appendChild(img);
+    };
+
+    reader.readAsDataURL(file);
+  };
+
+  input.click();
+}
+
+/* BACKGROUND */
+function bgUpload(id){
+  const input=document.createElement("input");
+  input.type="file";
+  input.accept="image/*";
+
+  input.onchange=e=>{
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      document.getElementById(id).src=ev.target.result;
+    };
+    reader.readAsDataURL(e.target.files[0]);
+  };
+
+  input.click();
+}
+
+/* TEMOINS */
+function addTemoin(){
+
+  const div=document.createElement("div");
+  div.className="temoin";
+
+  const photo=document.createElement("div");
+  photo.className="photo";
+
+  photo.onclick=()=>importImg(photo);
+
+  const text=document.createElement("div");
+  text.className="text";
+  text.contentEditable=true;
+  text.innerText="Témoignage...";
+
+  div.appendChild(photo);
+  div.appendChild(text);
+
+  document.getElementById("temoins").appendChild(div);
+}
+
+/* PDF FIX COMPLET */
+async function downloadPDF(){
+
+  const c = prompt("Code d'accès :");
 
   if(c !== CODE){
     alert("Code incorrect ❌");
     return;
   }
 
-  await generatePDF();
-};
-
-/* IMAGE */
-function importImg(el){
-  let i=document.createElement("input");
-  i.type="file";
-  i.accept="image/*";
-  i.onchange=e=>{
-    let f=e.target.files[0];
-    let r=new FileReader();
-    r.onload=ev=>{
-      el.innerHTML="<img src='"+ev.target.result+"' style='width:100%;height:100%;object-fit:cover'>";
-    };
-    r.readAsDataURL(f);
-  };
-  i.click();
-}
-
-/* BACKGROUND */
-function bgUpload(id){
-  let i=document.createElement("input");
-  i.type="file";
-  i.accept="image/*";
-  i.onchange=e=>{
-    let r=new FileReader();
-    r.onload=ev=>{
-      document.getElementById(id).src=ev.target.result;
-    };
-    r.readAsDataURL(e.target.files[0]);
-  };
-  i.click();
-}
-
-/* TEMOINS */
-function addTemoin(){
-  let block = document.createElement("div");
-  block.style.display = "flex";
-  block.style.gap = "10px";
-  block.style.alignItems = "flex-start";
-  block.style.marginBottom = "10px";
-
-  // 📸 PHOTO
-  let photo = document.createElement("div");
-  photo.className = "profile-photo";
-  photo.style.width = "70px";
-  photo.style.height = "70px";
-  photo.style.border = "3px solid #ccc";
-  photo.innerText = "Photo";
-
-  photo.onclick = function(){
-    let input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-
-    input.onchange = e=>{
-      let file = e.target.files[0];
-      let reader = new FileReader();
-
-      reader.onload = ev=>{
-        photo.innerHTML = "<img src='"+ev.target.result+"' style='width:100%;height:100%;object-fit:cover'>";
-      };
-
-      reader.readAsDataURL(file);
-    };
-
-    input.click();
-  };
-
-  // 📝 TEXTE
-  let text = document.createElement("div");
-  text.className = "editable";
-  text.contentEditable = true;
-  text.style.flex = "1";
-  text.innerText = "Écrire témoignage...";
-
-  block.appendChild(photo);
-  block.appendChild(text);
-
-  document.getElementById("temoins").appendChild(block);
-}
-
-/* PDF */
-async function generatePDF(){
-
-  if(typeof window.jspdf === "undefined"){
-    alert("Erreur: bibliothèque PDF non chargée ❌");
-    return;
-  }
-
   const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF("p", "mm", "a4");
+  const pdf = new jsPDF("p","mm","a4");
 
-  const pages =
+  const pages=document.querySelectorAll(".page");
 
+  let i=0;
 
+  for(const page of pages){
 
- document.querySelectorAll('.page').forEach(page => {
-  const clone = page.cloneNode(true);
-
-  // ✅ AJOUT SIGNATURE DANS CHAQUE PAGE
-  const signature = document.createElement("div");
-  signature.textContent = "Créé par ETS Lesfacilitateurs Groupe - WhatsApp +237651475255";
-  signature.style.fontSize = "10px";
-  signature.style.fontWeight = "bold";
-  signature.style.textAlign = "center";
-  signature.style.marginTop = "10px";
-
-  clone.appendChild(signature);
+    const clone=page.cloneNode(true);
 
     clone.querySelectorAll("button").forEach(b=>b.remove());
 
-    clone.style.width = "210mm";
-    clone.style.position = "absolute";
-    clone.style.left = "-9999px";
+    clone.style.position="absolute";
+    clone.style.left="-9999px";
+    clone.style.width="210mm";
 
     document.body.appendChild(clone);
 
-    const canvas = await html2canvas(clone,{
+    const canvas=await html2canvas(clone,{
       scale:2,
       useCORS:true,
       backgroundColor:"#fff"
     });
 
-    const img = canvas.toDataURL("image/jpeg",1);
+    const img=canvas.toDataURL("image/jpeg",1);
 
     if(i>0) pdf.addPage();
 
     pdf.addImage(img,"JPEG",0,0,210,297);
 
     clone.remove();
+
+    i++;
   }
 
   pdf.save("programme.pdf");
 }
 
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
 </body>
 </html>
