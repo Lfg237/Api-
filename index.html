@@ -303,11 +303,22 @@ async function generatePDF(){
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF("p", "mm", "a4");
 
-  const pages = document.querySelectorAll(".page");
+  const pages =
 
-  for(let i=0; i<pages.length; i++){
 
-    const clone = pages[i].cloneNode(true);
+
+ document.querySelectorAll('.page').forEach(page => {
+  const clone = page.cloneNode(true);
+
+  // ✅ AJOUT SIGNATURE DANS CHAQUE PAGE
+  const signature = document.createElement("div");
+  signature.textContent = "Créé par ETS Lesfacilitateurs Groupe - WhatsApp +237651475255";
+  signature.style.fontSize = "10px";
+  signature.style.fontWeight = "bold";
+  signature.style.textAlign = "center";
+  signature.style.marginTop = "10px";
+
+  clone.appendChild(signature);
 
     clone.querySelectorAll("button").forEach(b=>b.remove());
 
