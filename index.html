@@ -199,6 +199,19 @@ Localisation...
 </div>
 
 <script>
+	const CODE = "233233";
+
+document.getElementById("download").onclick = async ()=>{
+
+  let c = prompt("Entrez le code :");
+
+  if(c !== CODE){
+    alert("Code incorrect ❌");
+    return;
+  }
+
+  await generatePDF();
+};
 
 /* IMAGE */
 function importImg(el){
@@ -282,6 +295,11 @@ function addTemoin(){
 /* PDF */
 async function generatePDF(){
 
+  if(typeof window.jspdf === "undefined"){
+    alert("Erreur: bibliothèque PDF non chargée ❌");
+    return;
+  }
+
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF("p", "mm", "a4");
 
@@ -291,49 +309,25 @@ async function generatePDF(){
 
     const clone = pages[i].cloneNode(true);
 
-    // supprimer boutons
     clone.querySelectorAll("button").forEach(b=>b.remove());
 
-    // fixer largeur pour éviter bugs
     clone.style.width = "210mm";
-    clone.style.maxWidth = "210mm";
-
-    // placer hors écran
     clone.style.position = "absolute";
     clone.style.left = "-9999px";
 
     document.body.appendChild(clone);
 
-    // attendre chargement images
-    await new Promise(resolve=>{
-      const imgs = clone.querySelectorAll("img");
-      if(imgs.length === 0) resolve();
-
-      let loaded = 0;
-      imgs.forEach(img=>{
-        if(img.complete) loaded++;
-        else{
-          img.onload = img.onerror = ()=> {
-            loaded++;
-            if(loaded === imgs.length) resolve();
-          };
-        }
-      });
-
-      if(loaded === imgs.length) resolve();
-    });
-
     const canvas = await html2canvas(clone,{
       scale:2,
       useCORS:true,
-      backgroundColor:"#ffffff"
+      backgroundColor:"#fff"
     });
 
-    const imgData = canvas.toDataURL("image/jpeg",1);
+    const img = canvas.toDataURL("image/jpeg",1);
 
-    if(i > 0) pdf.addPage();
+    if(i>0) pdf.addPage();
 
-    pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
+    pdf.addImage(img,"JPEG",0,0,210,297);
 
     clone.remove();
   }
@@ -342,6 +336,8 @@ async function generatePDF(){
 }
 
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
 </body>
 </html>
